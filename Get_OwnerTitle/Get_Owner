@@ -1,0 +1,116 @@
+// to append menuitem to make api call to Harvest.
+function onOpen(){
+  try
+  {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet();
+    var entries =[];
+    entries.push({name:"Get Owner and Title", functionName:"makeGoogleCall"});    
+    sheet.addMenu("Google Call", entries);    
+  }
+  catch(e)
+  {
+    Logger.log("Error occured while creating menuitem for Google call. Details are %s",e);
+  }
+}
+
+
+function makeGoogleCall()
+{
+  try
+  {
+    var workBook = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = workBook.getSheets()[0];
+    
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var nextRow = sheet.getLastRow()+1; // get next row
+    var row = []; 
+  
+    var startRow = 2;
+    var startColumn =1;
+    var totalRows  = sheet.getLastRow()-1;
+    var totalColumns = sheet.getLastColumn();
+
+    var ranges =  sheet.getRange(startRow,startColumn,totalRows,totalColumns)  
+    var values  = ranges.getValues();  
+    
+    var url ="";
+    var response ="";
+    var htmlResponse = "";
+    /*
+    var regExp = new RegExp("(pattern)", "gi");
+var value = regExp.exec(page.getContentText())[1]
+    */
+    var regExp = new RegExp("Owner name:(?!.*	Owner name:)","gi");    
+    var matches = null;    
+    var lastIndex= -1;
+    var subStr ="";
+    var offSet =46;
+    var endOfSpan = -1;
+    var owner ="";
+    var title =""    
+    var lastIndexInventionTitleStartTag = -1;
+    var lastIndexOfInventionTitleEndTag = -1;
+    var lastIndexOfHtmlTag =-1;
+    var indexOfMxwId =-1;
+    var htmlTagSubStr = "";
+    
+    var row = []; 
+    for(var i = 0; i < values.length; i++)
+    {
+      url = values[i][2];
+      response = UrlFetchApp.fetch(url);      
+      htmlResponse = response.getContentText();
+      //matches = regExp.exec(htmlResponse)[0];
+      lastIndex = htmlResponse.lastIndexOf("Owner name:");
+           
+      lastIndexInventionTitleStartTag = htmlResponse.lastIndexOf("<invention-title");      
+//      Logger.log("lastIndexInventionTitleStartTag is %s",lastIndexInventionTitleStartTag);
+      
+      htmlTagSubStr = htmlResponse.substr(lastIndexInventionTitleStartTag,500);      
+//      Logger.log("htmlTagSubStr %s",htmlTagSubStr);
+//      Logger.log("%s",lastIndex);     
+
+      lastIndexOfInventionTitleEndTag = htmlTagSubStr.lastIndexOf("</invention-title>") 
+//      Logger.log("lastIndexInventionTitleTag %s",lastIndexOfInventionTitleEndTag);
+      
+      lastIndexOfHtmlTag = htmlTagSubStr.indexOf(">");
+//      Logger.log("lastIndexOfHtmlTag %s",lastIndexOfHtmlTag);
+      title = htmlTagSubStr.substr(lastIndexOfHtmlTag+1 , lastIndexOfInventionTitleEndTag-lastIndexOfHtmlTag-1);
+//      Logger.log("Title %s",title);
+      subStr = htmlResponse.substr(lastIndex+offSet,100);
+      endOfSpan = subStr.lastIndexOf("</span>");
+      owner = subStr.substr(0,endOfSpan);
+//      Logger.log("%s",subStr);
+//      Logger.log("%s",endOfSpan);
+//      Logger.log("Owner is %s",owner);
+      values[i][3]= owner;
+      row.push(values[i][0]);
+      row.push(values[i][1]);
+      row.push(values[i][2]);
+      row.push(values[i][3]);
+      row.push(title);      
+      sheet.getRange(i+2, 1, 1, row.length).setValues([row]);
+      url ="";
+      response ="";
+      htmlResponse ="";      
+      matches =null;
+      subStr="";
+      endOfSpan=-1;
+      owner = "";
+      row = [];  
+      title="";
+      lastIndexInventionTitleStartTag = -1;
+      lastIndexOfInventionTitleEndTag = -1;
+      lastIndexOfHtmlTag =-1;
+      indexOfMxwId =-1;
+      htmlTagSubStr = "";
+
+    }
+
+    
+  }
+  catch(e)
+  {
+    Logger.log("An error occured in makeGoogleCall() details are %s",e);
+  }
+}

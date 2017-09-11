@@ -1,0 +1,24 @@
+/**
+ * Format Patent Holder Names
+ * @param mixed  input  String or cell reference
+ */
+function ExtractProperNames(input) {
+  var text = input.replace(/(?:,*\s*a corporation of\s(?:the\s|)|,\s*)(?:Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New (?:Hampshire|Jersey|Mexico|York)|North (?:Carolina|Dakota)|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode Island|South (?:Carolina|Dakota)|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming|USA|JAPAN|GERMANY|TAIWAN|SOUTH KOREA|UNITED KINGDOM|FRANCE|CANADA|ITALY|SWITZERLAND|NETHERLANDS|SWEDEN|CHINA|AUSTRALIA|ISRAEL|FINLAND|BELGIUM|AUSTRIA|DENMARK|INDIA|HONG KONG|SPAIN|SINGAPORE|NORWAY|IRELAND|NEW ZEALAND|RUSSIAN FEDERATION|SOUTH AFRICA|BRAZIL|HUNGARY|MEXICO|MALAYSIA|LUXEMBOURG|ARGENTINA|POLAND|CZECH REPUBLIC|SAUDI ARABIA|THAILAND|GREECE|VENEZUELA|BULGARIA|LIECHTENSTEIN|TURKEY|PHILIPPINES|PORTUGAL|CHILE|SLOVENIA|UKRAINE|ICELAND|ROMANIA|KUWAIT|MONACO|COSTA RICA|SERBIA-MONTENEGRO|INDONESIA|COLOMBIA|CROATIA|EGYPT|THE BAHAMAS|UNITED ARAB EMIRATES|UAE|ESTONIA|SLOVAKIA|IRAN|ISLE OF MAN|URUGUAY|CAYMAN ISLANDS|CUBA|LEBANON|PERU|BELARUS|JERSEY|LITHUANIA|BERMUDA|PAKISTAN|SRI LANKA|KENYA|ECUADOR|GUERNSEY|CYPRUS|TRINIDAD AND TOBAGO|MALTA|BRITISH VIRGIN ISLANDS|SERBIA|DOMINICAN REPUBLIC|JAMAICA|MACAU|GUATEMALA|LATVIA|MOROCCO|PANAMA|JORDAN|GEORGIA|ZIMBABWE|TUNISIA|VIET NAM|VIETNAM|NIGERIA|ANDORRA|BARBADOS|ARMENIA)$/i, "");
+      text = text.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+      text = text.replace(/(\b(\w{1,3})\b)/ig, function(txt){
+        var words = [
+          'new','lee','max','now','son','sun','ray','mop','car','cow','cat','bat','hat','rat','few','run',
+          'fun','gun','co','pet','and','out','get','win','are','an','of','the','off','top','air','tod',
+          'all','zip','sum','ram','tom','to','too','ask','ax','axe','on'
+        ];
+        if(words.indexOf(txt.toLowerCase()) == -1){
+          txt = txt.toUpperCase();
+        }
+        return txt;
+      });
+      text = text.replace(/(l\.*l\.*c\.*)/i, 'LLC');
+      text = text.replace(/(l\.*t\.*d\.*)/i, 'Ltd.');
+      text = text.replace(/(i\.*n\.*c\.*)/i, 'Inc.');
+      text = text.replace(/(\b[a-z]\.[a-z]\.(\b[a-z]\.*)*)/i, function(txt){return txt.toUpperCase();});
+  return text;
+}
